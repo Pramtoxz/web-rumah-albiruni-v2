@@ -1,0 +1,275 @@
+import AppLayout from '@/layouts/app-layout';
+import { Head, Link, router } from '@inertiajs/react';
+import { Button } from '@/components/ui/button';
+import { Plus, Pencil, Trash2, UserCog, Search } from 'lucide-react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { useState, useEffect } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
+import ConfirmDialog from '@/components/confirm-dialog';
+
+interface Guru {
+    id: number;
+    nip: string | null;
+    nama_lengkap: string;
+    jenis_kelamin: string | null;
+    pendidikan_terakhir: string | null;
+    foto_guru: string | null;
+    guru_utama_id: number | null;
+    user?: {
+        id: number;
+        name: string;
+        email: string;
+        nohp: string;
+    };
+    kelas: {
+        id: number;
+        nama_kelas: string;
+    } | null;
+    guru_utama: {
+        id: number;
+        nama_lengkap: string;
+    } | null;
+}
+
+interface Props {
+    gurus: {
+        data: Guru[];
+        links: any[];
+        current_page: number;
+        last_page: number;
+    };
+    filters: {
+        search?: string;
+    };
+}
+
+export default function GuruIndex({ gurus, filters }: Props) {
+    const [search, setSearch] = useState(filters.search || '');
+    const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; id: number | null; nama: string }>({
+        open: false,
+        id: null,
+        nama: '',
+    });
+
+    const debouncedSearch = useDebouncedCallback((value: string) => {
+        router.get(
+            '/admin/guru',
+            { search: value },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    }, 500);
+
+    useEffect(() => {
+        debouncedSearch(search);
+    }, [search]);
+
+    const handleDelete = () => {
+        if (deleteDialog.id) {
+            router.delete(`/admin/guru/${deleteDialog.id}`);
+            setDeleteDialog({ open: false, id: null, nama: '' });
+        }
+    };
+
+    return (
+        <AppLayout>
+            <Head title="Data Guru" />
+
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                    <div>
+                        <h1 className="text-3xl font-bold">Data Guru</h1>
+                        <p className="text-muted-foreground mt-1">
+                            Kelola data guru dan penugasan kelas
+                        </p>
+                    </div>
+                    <Link href="/admin/guru/create">
+                        <Button>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Tambah Guru
+                        </Button>
+                    </Link>
+                </div>
+
+                {/* Search Bar */}
+                <div className="flex items-center gap-4">
+                    <div className="relative flex-1 max-w-md">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            type="text"
+                            placeholder="Cari nama, NIP, email, atau nomor HP..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="pl-10"
+                        />
+                    </div>
+                    {search && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setSearch('')}
+                        >
+                            Reset
+                        </Button>
+                    )}
+                </div>
+
+                {/* Table */}
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Guru</TableHead>
+                                    <TableHead>Tipe</TableHead>
+                                    <TableHead>NIP</TableHead>
+                                    <TableHead>Kontak</TableHead>
+                                    <TableHead>Kelas</TableHead>
+                                    <TableHead>Pendidikan</TableHead>
+                                    <TableHead className="text-right">Aksi</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {gurus.data.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={7} className="text-center py-8">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <UserCog className="h-12 w-12 text-muted-foreground" />
+                                                <p className="text-muted-foreground">
+                                                    Belum ada data guru
+                                                </p>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    gurus.data.map((guru) => (
+                                        <TableRow key={guru.id}>
+                                            <TableCell>
+                                                <div className="flex items-center gap-3">
+                                                    <Avatar>
+                                                        {guru.foto_guru ? (
+                                                            <AvatarImage
+                                                                src={`/assets/images/foto_guru/${guru.foto_guru}`}
+                                                                alt={guru.nama_lengkap}
+                                                            />
+                                                        ) : null}
+                                                        <AvatarFallback>
+                                                            {guru.nama_lengkap.charAt(0).toUpperCase()}
+                                                        </AvatarFallback>
+                                                    </Avatar>
+                                                    <div>
+                                                        <p className="font-medium">{guru.nama_lengkap}</p>
+                                                        {guru.jenis_kelamin && (
+                                                            <p className="text-sm text-muted-foreground">
+                                                                {guru.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="space-y-1">
+                                                    {guru.guru_utama_id ? (
+                                                        <>
+                                                            <Badge variant="secondary" className="text-xs">
+                                                                Guru Pendamping
+                                                            </Badge>
+                                                            {guru.guru_utama && (
+                                                                <p className="text-xs text-muted-foreground">
+                                                                    Membantu: {guru.guru_utama.nama_lengkap}
+                                                                </p>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <Badge variant="default" className="text-xs">
+                                                            Guru Utama
+                                                        </Badge>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {guru.nip || (
+                                                    <span className="text-muted-foreground text-sm">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                <div className="text-sm">
+                                                    <p>{guru.user?.email || '-'}</p>
+                                                    <p className="text-muted-foreground">{guru.user?.nohp || '-'}</p>
+                                                </div>
+                                            </TableCell>
+                                            <TableCell>
+                                                {guru.kelas ? (
+                                                    <Badge variant="secondary">
+                                                        {guru.kelas.nama_kelas}
+                                                    </Badge>
+                                                ) : (
+                                                    <span className="text-muted-foreground text-sm">
+                                                        Belum ditugaskan
+                                                    </span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {guru.pendidikan_terakhir || (
+                                                    <span className="text-muted-foreground text-sm">-</span>
+                                                )}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <Link href={`/admin/guru/${guru.id}/edit`}>
+                                                        <Button variant="ghost" size="sm" title="Edit">
+                                                            <Pencil className="h-4 w-4" />
+                                                        </Button>
+                                                    </Link>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            setDeleteDialog({
+                                                                open: true,
+                                                                id: guru.id,
+                                                                nama: guru.nama_lengkap,
+                                                            })
+                                                        }
+                                                        title="Hapus"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+
+            {/* Delete Confirmation Dialog */}
+            <ConfirmDialog
+                open={deleteDialog.open}
+                onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+                onConfirm={handleDelete}
+                title="Konfirmasi Hapus"
+                description={`Apakah Anda yakin ingin menghapus data guru <strong>"${deleteDialog.nama}"</strong>?<br /><br />Tindakan ini tidak dapat dibatalkan dan akan menghapus semua data terkait guru ini.`}
+                confirmText="Hapus"
+                variant="destructive"
+            />
+        </AppLayout>
+    );
+}

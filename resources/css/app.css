@@ -1,0 +1,545 @@
+/* @import 'tailwindcss';
+@import './mobile.css';
+
+@plugin 'tailwindcss-animate';
+
+@source "../views";
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    --font-sans:
+        'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+:root {
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --destructive-foreground: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.87 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --radius: 0.625rem;
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.87 0 0);
+}
+
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.145 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.145 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.985 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.396 0.141 25.723);
+    --destructive-foreground: oklch(0.637 0.237 25.331);
+    --border: oklch(0.269 0 0);
+    --input: oklch(0.269 0 0);
+    --ring: oklch(0.439 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.985 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(0.269 0 0);
+    --sidebar-ring: oklch(0.439 0 0);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+    }
+} */
+
+@import 'tailwindcss';
+@import './mobile.css';
+
+@plugin 'tailwindcss-animate';
+
+@source "../views";
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+    /* Font Kindergarten - Nunito & Comfortaa */
+    --font-sans:
+        'Nunito', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    
+    --font-heading:
+        'Comfortaa', cursive, ui-sans-serif, system-ui, sans-serif;
+
+    --radius-lg: var(--radius);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-sm: calc(var(--radius) - 4px);
+
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Warna Success untuk tombol "Habis" */
+    --color-success: var(--success);
+    --color-success-foreground: var(--success-foreground);
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentColor);
+    }
+}
+
+/* ============================================
+   TEMA KINDERGARTEN - AL-BIRUNI PRESCHOOL
+   Warna mengikuti kindergarten.css:
+   - Primary (Biru): #1E88E5  
+   - Secondary (Merah-Pink): #FF6B6B
+   - Accent (Kuning): #FFD166
+   - Background: Gradient dari #1E88E5 ke #2A2D34
+   ============================================ */
+:root {
+    /* Latar Belakang - Biru sangat muda seperti langit */
+    --background: oklch(0.98 0.01 240);         /* #F0F8FF - Light blue background */
+
+    /* Latar Permukaan (Kartu, Navigasi, Popover) */
+    --card: oklch(1 0 0);                       /* Putih bersih untuk kartu */
+    --popover: oklch(1 0 0);
+    --sidebar: oklch(1 0 0);
+
+    /* Teks (Tipografi) - Dark color dari kindergarten.css */
+    --foreground: oklch(0.22 0.01 260);         /* #2A2D34 - Dark color */
+    --card-foreground: oklch(0.22 0.01 260);
+    --popover-foreground: oklch(0.22 0.01 260);
+    --sidebar-foreground: oklch(0.22 0.01 260);
+    --muted-foreground: oklch(0.55 0.01 260);   /* Abu-abu muda untuk teks sekunder */
+
+    /* Primary - Biru (#1E88E5) dari kindergarten.css */
+    --primary: oklch(0.62 0.15 245);            /* #1E88E5 - Secondary color (Biru) */
+    --primary-foreground: oklch(1 0 0);         /* Teks putih di atasnya */
+    
+    --sidebar-primary: oklch(0.62 0.15 245);
+    --sidebar-primary-foreground: oklch(1 0 0);
+
+    /* Success - Hijau Mint untuk tombol "habis" */
+    --success: oklch(0.72 0.12 160);            /* Hijau mint ceria */
+    --success-foreground: oklch(1 0 0);         /* Teks putih di atasnya */
+
+    /* Secondary - Merah-Pink (#FF6B6B) dari kindergarten.css */
+    --secondary: oklch(0.72 0.18 15);           /* #FF6B6B - Primary color (Merah-pink) */
+    --secondary-foreground: oklch(1 0 0);       /* Teks putih di atasnya */
+
+    /* Accent - Kuning (#FFD166) dari kindergarten.css */
+    --accent: oklch(0.88 0.12 85);              /* #FFD166 - Accent color (Kuning) */
+    --accent-foreground: oklch(0.22 0.01 260);  /* Teks dark di atasnya */
+    --sidebar-accent: oklch(0.88 0.12 85);
+    --sidebar-accent-foreground: oklch(0.22 0.01 260);
+
+    /* Garis & Input - Halus dan lembut */
+    --border: oklch(0.92 0.005 240);            /* Border halus kebiruan */
+    --input: oklch(0.92 0.005 240);
+    --ring: oklch(0.62 0.15 245);               /* Ring fokus biru */
+    --sidebar-border: oklch(0.92 0.005 240);
+    --sidebar-ring: oklch(0.62 0.15 245);
+
+    /* Destructive - Merah lembut untuk error */
+    --destructive: oklch(0.65 0.22 25);         /* Merah lembut */
+    --destructive-foreground: oklch(1 0 0);     /* Teks putih */
+    
+    /* Muted - Abu-abu sangat muda */
+    --muted: oklch(0.96 0.005 240);
+    
+    /* Border Radius - Rounded corners yang playful */
+    --radius: 0.75rem;                          /* Lebih rounded untuk tema anak-anak */
+
+    /* Chart colors - Warna ceria untuk grafik */
+    --chart-1: oklch(0.72 0.18 15);             /* Merah-pink */
+    --chart-2: oklch(0.62 0.15 245);            /* Biru */
+    --chart-3: oklch(0.88 0.12 85);             /* Kuning */
+    --chart-4: oklch(0.72 0.12 160);            /* Hijau mint */
+    --chart-5: oklch(0.75 0.15 300);            /* Ungu muda */
+}
+
+
+/* ============================================
+   DARK MODE (Tidak aktif, tapi tetap didefinisikan)
+   ============================================ */
+.dark {
+    --background: oklch(0.15 0.02 260);
+    --foreground: oklch(0.98 0 0);
+    --card: oklch(0.18 0.02 260);
+    --card-foreground: oklch(0.98 0 0);
+    --popover: oklch(0.18 0.02 260);
+    --popover-foreground: oklch(0.98 0 0);
+    --primary: oklch(0.62 0.15 245);
+    --primary-foreground: oklch(1 0 0);
+    --secondary: oklch(0.72 0.18 15);
+    --secondary-foreground: oklch(1 0 0);
+    --muted: oklch(0.25 0.02 260);
+    --muted-foreground: oklch(0.65 0.01 260);
+    --accent: oklch(0.88 0.12 85);
+    --accent-foreground: oklch(0.22 0.01 260);
+    --destructive: oklch(0.65 0.22 25);
+    --destructive-foreground: oklch(1 0 0);
+    --border: oklch(0.25 0.02 260);
+    --input: oklch(0.25 0.02 260);
+    --ring: oklch(0.62 0.15 245);
+    --chart-1: oklch(0.72 0.18 15);
+    --chart-2: oklch(0.62 0.15 245);
+    --chart-3: oklch(0.88 0.12 85);
+    --chart-4: oklch(0.72 0.12 160);
+    --chart-5: oklch(0.75 0.15 300);
+    --sidebar: oklch(0.18 0.02 260);
+    --sidebar-foreground: oklch(0.98 0 0);
+    --sidebar-primary: oklch(0.62 0.15 245);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.25 0.02 260);
+    --sidebar-accent-foreground: oklch(0.98 0 0);
+    --sidebar-border: oklch(0.25 0.02 260);
+    --sidebar-ring: oklch(0.62 0.15 245);
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+
+    body {
+        @apply text-foreground;
+        font-family: 'Nunito', var(--font-sans);
+        background: linear-gradient(135deg, #F0F8FF 0%, #E3F2FD 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Comfortaa', cursive, var(--font-sans);
+    }
+    
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    button:not(:disabled), a {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    button:not(:disabled):hover, a:hover {
+        transform: translateY(-2px);
+    }
+    
+    button:not(:disabled):active, a:active {
+        transform: translateY(0);
+    }
+}
+
+
+
+/* ============================================
+   KINDERGARTEN THEME - UTILITY CLASSES
+   ============================================ */
+
+/* Animasi playful dari kindergarten.css */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes twinkle {
+    0%, 100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+}
+
+/* Utility classes untuk animasi */
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-slow {
+    animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-soft {
+    animation: pulse 3s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+    animation: rotate 10s linear infinite;
+}
+
+.animate-fade-in-up {
+    animation: fadeInUp 1s ease;
+}
+
+.animate-twinkle {
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+/* Backdrop blur untuk efek modern */
+.backdrop-blur-kindergarten {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Shadow playful untuk kartu */
+.shadow-kindergarten {
+    box-shadow: 0 10px 30px rgba(30, 136, 229, 0.15);
+}
+
+.shadow-kindergarten-hover:hover {
+    box-shadow: 0 15px 40px rgba(30, 136, 229, 0.25);
+}
+
+/* Border radius playful */
+.rounded-kindergarten {
+    border-radius: 1.5rem;
+}
+
+/* Gradient backgrounds */
+.bg-gradient-kindergarten {
+    background: linear-gradient(135deg, rgba(240,248,255,0.8) 0%, rgba(30,136,229,0.2) 100%);
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #1E88E5 0%, #1976D2 100%);
+}
+
+.bg-gradient-primary-dark {
+    background: linear-gradient(135deg, #1E88E5 0%, #2A2D34 100%);
+    background-attachment: fixed;
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(135deg, #FF6B6B 0%, #ff5252 100%);
+}
+
+.bg-gradient-accent {
+    background: linear-gradient(135deg, #FFD166 0%, #FFE066 100%);
+}
+
+/* Text gradients */
+.text-gradient-primary {
+    background: linear-gradient(135deg, #1E88E5 0%, #1976D2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.text-gradient-secondary {
+    background: linear-gradient(135deg, #FF6B6B 0%, #ff5252 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Button hover effects */
+.btn-kindergarten {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-kindergarten:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(30, 136, 229, 0.4);
+}
+
+.btn-kindergarten:active {
+    transform: translateY(0);
+}
+
+/* Card hover effects */
+.card-kindergarten {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-kindergarten:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+}

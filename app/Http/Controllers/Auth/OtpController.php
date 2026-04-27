@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Enums\OtpType;
+use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Services\OtpService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
+
+class OtpController extends Controller
+{
+    public function __construct(
+        protected OtpService $otpService
+    ) {
+    }
+
+    public function send(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'type' => ['required', Rule::enum(OtpType::class)],
+            'nohp' => ['required', 'string', 'max:20'],
+            'email' => ['nullable', 'email'],
+        ]);
+
+        $otpType = OtpType::from($validated['type']);
+        $phone = $this->otpService->normalizePhone($validated['nohp']);
+        $email = $validated['email'] ?? null;
+
+        match ($otpType) {
+            OtpType::Login => $this->ensureUserExistsForLogin($phone),
+            OtpType::Register => $this->ensurePhoneAvailable($phone),
+            OtpType::PasswordReset => $this->ensureUserExistsForPasswordReset($phone, $email),
+        };
+
+        $this->otpService->send($phone, $otpType, array_filter([
+            'email' => $email,
+        ]));
+
+        $channelsMessage = $email
+            ? __('Kode OTP telah dikirim ke WhatsApp dan email Anda.')
+            : __('Kode OTP telah dikirim ke WhatsApp Anda.');
+
+        return response()->json([
+            'message' => $channelsMessage,
+        ]);
+    }
+
+    public function login(Request $request): Response
+    {
+        $request->merge([
+            'nohp' => $this->otpService->normalizePhone($request->string('nohp')->toString()),
+        ]);
+
+        // Bypass OTP hanya jika environment local DAN bypass_otp_in_dev = true
+        $bypassOtp = config('app.env') === 'local' && config('app.bypass_otp_in_dev') === true;
+
+        $validated = $request->validate([
+            'nohp' => ['required', 'string', 'max:20'],
+            'otp_code' => [$bypassOtp ? 'nullable' : 'required', 'string', 'size:6'],
+            'remember' => ['nullable', 'boolean'],
+        ], [
+            'otp_code.required' => 'Kode OTP wajib diisi.',
+            'otp_code.size' => 'Kode OTP harus 6 digit.',
+        ]);
+
+        $user = User::where('nohp', $validated['nohp'])->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'nohp' => [__('Akun dengan nomor tersebut tidak ditemukan.')],
+            ]);
+        }
+
+        // Jika bypass diaktifkan DAN otp_code kosong, skip validasi
+        // Jika bypass tidak aktif ATAU otp_code diisi, validasi OTP
+        if (!$bypassOtp || !empty($validated['otp_code'])) {
+            $this->otpService->validate(
+                $validated['nohp'],
+                $validated['otp_code'],
+                OtpType::Login
+            );
+        }
+
+        // Auto-enable remember me for webview compatibility
+        Auth::login($user, true);
+
+        // Ensure proper session regeneration after login
+        $request->session()->regenerate();
+
+        // Determine redirect destination
+        $redirectUrl = $request->session()->pull('url.intended', route('dashboard', absolute: false));
+        
+        // Jika user adalah orangtua dan belum ada data siswa, redirect ke pendaftaran siswa
+        if ($user->role === 'orangtua' && !$user->siswa) {
+            $redirectUrl = route('siswa.create', absolute: false);
+        }
+
+        // Return Inertia location response for smooth webview navigation
+        return Inertia::location($redirectUrl);
+    }
+
+    protected function ensureUserExistsForLogin(string $phone): void
+    {
+        $exists = User::where('nohp', $phone)->exists();
+
+        if (! $exists) {
+            throw ValidationException::withMessages([
+                'nohp' => [__('Nomor WhatsApp belum terdaftar.')],
+            ]);
+        }
+    }
+
+    protected function ensurePhoneAvailable(string $phone): void
+    {
+        $exists = User::where('nohp', $phone)->exists();
+
+        if ($exists) {
+            throw ValidationException::withMessages([
+                'nohp' => [__('Nomor WhatsApp sudah digunakan.')],
+            ]);
+        }
+    }
+
+    protected function ensureUserExistsForPasswordReset(string $phone, ?string $email): void
+    {
+        if (! $email) {
+            throw ValidationException::withMessages([
+                'email' => [__('Email wajib diisi untuk verifikasi OTP.')],
+            ]);
+        }
+
+        $user = User::where('email', $email)->first();
+
+        if (! $user) {
+            throw ValidationException::withMessages([
+                'email' => [__('Akun dengan email tersebut tidak ditemukan.')],
+            ]);
+        }
+
+        $this->otpService->assertPhoneMatchesUser($user, $phone);
+    }
+}
