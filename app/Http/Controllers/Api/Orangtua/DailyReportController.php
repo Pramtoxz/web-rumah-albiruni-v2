@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Orangtua;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\DailyReportResource;
 use App\Models\DailyReport;
 use App\Models\Siswa;
 use Illuminate\Http\Request;
@@ -41,9 +42,8 @@ class DailyReportController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(20);
 
-        return response()->json([
+        return DailyReportResource::collection($reports)->additional([
             'success' => true,
-            'data' => $reports,
         ]);
     }
 
@@ -63,9 +63,8 @@ class DailyReportController extends Controller
             ->where('siswa_id', $siswa->id)
             ->findOrFail($id);
 
-        return response()->json([
+        return (new DailyReportResource($report))->additional([
             'success' => true,
-            'data' => $report,
         ]);
     }
 }
